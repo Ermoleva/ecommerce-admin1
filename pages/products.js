@@ -1,21 +1,22 @@
 import Layout from "@/components/Layout";
+import Spinner from "@/components/Spinner";
 import axios from "axios";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
 export default function Products() {
   const [products, setProducts] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
   useEffect(() => {
+    setIsLoading(true);
     axios.get("/api/products").then((response) => {
       setProducts(response.data);
+      setIsLoading(false);
     });
   }, []);
   return (
     <Layout>
-      <Link
-        className="btn-primary"
-        href={"/products/new"}
-      >
+      <Link className="btn-primary" href={"/products/new"}>
         Add new product
       </Link>
       <table className="basic mt-2">
@@ -26,12 +27,24 @@ export default function Products() {
           </tr>
         </thead>
         <tbody>
+          {isLoading && (
+            <tr>
+            <td colSpan={2}>
+              <div className="py-4">
+              <Spinner fullWidth={true}/>
+              </div>
+              </td>
+          </tr>
+          )}
+          
           {products.map((product) => (
-            // eslint-disable-next-line react/jsx-key
             <tr key={product._id}>
               <td>{product.title}</td>
               <td>
-                <Link className="btn-default" href={"/products/edit/" + product._id}>
+                <Link
+                  className="btn-default"
+                  href={"/products/edit/" + product._id}
+                >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     fill="none"
@@ -49,7 +62,10 @@ export default function Products() {
                   </svg>
                   Edit
                 </Link>
-                <Link className="btn-red" href={"/products/delete/" + product._id}>
+                <Link
+                  className="btn-red"
+                  href={"/products/delete/" + product._id}
+                >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     fill="none"
